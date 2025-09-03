@@ -1,0 +1,105 @@
+/* Hebrew BiDi Text Fix Styles - Improved Version */
+
+/* Base styles for bidirectionally fixed elements */
+.hebrew-bidi-fixed {
+    unicode-bidi: plaintext !important;
+}
+
+/* RTL-specific styles (Hebrew primary) */
+.hebrew-bidi-fixed[style*="direction: rtl"] {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+/* LTR-specific styles (English primary with Hebrew content) */
+.hebrew-bidi-fixed[style*="direction: ltr"] {
+    direction: ltr !important;
+    text-align: left !important;
+}
+
+/* Ensure proper handling of mixed text with plaintext bidi */
+.hebrew-bidi-fixed * {
+    unicode-bidi: plaintext !important;
+}
+
+/* Specific fixes for common Claude UI elements */
+[data-testid*="message"] .hebrew-bidi-fixed,
+.message-content .hebrew-bidi-fixed,
+.chat-message .hebrew-bidi-fixed,
+div[role="article"] .hebrew-bidi-fixed {
+    unicode-bidi: plaintext !important;
+}
+
+/* Handle code blocks and pre-formatted text - always LTR */
+.hebrew-bidi-fixed pre,
+.hebrew-bidi-fixed code,
+pre.hebrew-bidi-fixed,
+code.hebrew-bidi-fixed {
+    direction: ltr !important;
+    text-align: left !important;
+    unicode-bidi: normal !important;
+}
+
+/* Handle inline code within mixed text */
+.hebrew-bidi-fixed code {
+    display: inline;
+    direction: ltr !important;
+    unicode-bidi: embed !important;
+}
+
+/* Lists - inherit direction from parent */
+.hebrew-bidi-fixed ul,
+.hebrew-bidi-fixed ol {
+    unicode-bidi: plaintext !important;
+}
+
+.hebrew-bidi-fixed li {
+    unicode-bidi: plaintext !important;
+}
+
+/* Tables - inherit direction from parent */
+.hebrew-bidi-fixed table {
+    unicode-bidi: plaintext !important;
+}
+
+.hebrew-bidi-fixed th,
+.hebrew-bidi-fixed td {
+    unicode-bidi: plaintext !important;
+}
+
+/* Preserve specific language directions when explicitly marked */
+.hebrew-bidi-fixed [lang="he"] {
+    direction: rtl !important;
+    unicode-bidi: embed !important;
+}
+
+.hebrew-bidi-fixed [lang="en"] {
+    direction: ltr !important;
+    unicode-bidi: embed !important;
+}
+
+/* Fix for mathematical expressions and formulas - always LTR */
+.hebrew-bidi-fixed .math,
+.hebrew-bidi-fixed .katex,
+.hebrew-bidi-fixed [class*="math"] {
+    direction: ltr !important;
+    unicode-bidi: normal !important;
+}
+
+/* Ensure URLs and email addresses display correctly */
+.hebrew-bidi-fixed a[href^="http"],
+.hebrew-bidi-fixed a[href^="mailto"] {
+    direction: ltr !important;
+    unicode-bidi: embed !important;
+}
+
+/* Handle quoted text properly */
+.hebrew-bidi-fixed blockquote {
+    unicode-bidi: plaintext !important;
+}
+
+/* Special handling for input fields if they appear in processed content */
+.hebrew-bidi-fixed input[type="text"],
+.hebrew-bidi-fixed textarea {
+    unicode-bidi: plaintext !important;
+}
