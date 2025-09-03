@@ -1,4 +1,4 @@
-// Hebrew BiDi Text Fix for Claude - Improved Version
+// Universal Hebrew BiDi Text Fix for AI Chat Platforms
 (function() {
     'use strict';
 
@@ -54,6 +54,22 @@
         return 'ltr'; // Default to LTR
     }
 
+    // Function to check if element is an input field
+    function isInputField(element) {
+        const tagName = element.tagName.toLowerCase();
+        const inputTypes = ['input', 'textarea'];
+
+        if (inputTypes.includes(tagName)) return true;
+
+        // Check for contenteditable elements (common in AI chat platforms)
+        if (element.contentEditable === 'true' || element.hasAttribute('contenteditable')) return true;
+
+        // Check for elements with role="textbox"
+        if (element.getAttribute('role') === 'textbox') return true;
+
+        return false;
+    }
+
     // Function to apply intelligent BiDi formatting
     function applySmartBiDiFormatting(element) {
         if (element.nodeType === Node.TEXT_NODE) {
@@ -83,20 +99,89 @@
         }
 
         const hasMixedContent = containsHebrew(text) && containsEnglish(text);
+        const isInput = isInputField(element);
 
         if (direction === 'rtl') {
             // Hebrew primary direction
             element.style.direction = 'rtl';
-            element.style.textAlign = 'right';
-            element.style.unicodeBidi = hasMixedContent ? 'plaintext' : 'embed';
+            if (isInput) {
+                // For input fields, use 'start' to align with direction
+                element.style.textAlign = 'start';
+            } else {
+                element.style.textAlign = 'right';
+            }
+            element.style.unicodeBidi = 'plaintext';
             element.classList.add('hebrew-bidi-fixed', 'hebrew-bidi-processed');
-        } else if (direction === 'ltr' && hasMixedContent) {
-            // English primary direction with Hebrew content
+        } else if (direction === 'ltr') {
+            // English primary direction
             element.style.direction = 'ltr';
-            element.style.textAlign = 'left';
+            if (isInput) {
+                // For input fields, use 'start' to align with direction
+                element.style.textAlign = 'start';
+            } else if (hasMixedContent) {
+                element.style.textAlign = 'left';
+            }
             element.style.unicodeBidi = 'plaintext';
             element.classList.add('hebrew-bidi-fixed', 'hebrew-bidi-processed');
         }
+    }
+
+    // Function to handle input field events (real-time typing)
+    function handleInputFieldChange(event) {
+        const element = event.target;
+        const text = element.value || element.textContent || '';
+
+        if (text.length > 0 && (containsHebrew(text) || containsEnglish(text))) {
+            const direction = getPrimaryDirection(text);
+
+            // Remove previous processing class to reprocess
+            element.classList.remove('hebrew-bidi-processed');
+
+            // Apply new direction
+            applyDirectionToElement(element, direction, text);
+        } else {
+            // Reset to default if no text or no mixed content
+            element.style.direction = '';
+            element.style.textAlign = '';
+            element.style.unicodeBidi = '';
+            element.classList.remove('hebrew-bidi-fixed', 'hebrew-bidi-processed');
+        }
+    }
+
+    // Function to set up input field listeners
+    function setupInputListeners() {
+        // Find all input fields
+        const inputSelectors = [
+            'input[type="text"]',
+            'input:not([type])', // inputs without type default to text
+            'textarea',
+            '[contenteditable="true"]',
+            '[contenteditable]',
+            '[role="textbox"]'
+        ];
+
+        inputSelectors.forEach(selector => {
+            const inputs = document.querySelectorAll(selector);
+            inputs.forEach(input => {
+                if (!input.hasAttribute('data-bidi-listener')) {
+                    // Add event listeners for real-time processing
+                    input.addEventListener('input', handleInputFieldChange);
+                    input.addEventListener('keyup', handleInputFieldChange);
+                    input.addEventListener('paste', (event) => {
+                        // Handle paste events with a small delay
+                        setTimeout(() => handleInputFieldChange(event), 10);
+                    });
+
+                    // Mark as having listener to avoid duplicates
+                    input.setAttribute('data-bidi-listener', 'true');
+
+                    // Process current content if any
+                    if (input.value || input.textContent) {
+                        handleInputFieldChange({ target: input });
+                    }
+                }
+            });
+        });
     }
 
     // Function to process all text elements in a container
@@ -109,8 +194,7 @@
                     // Skip script, style, and already processed elements
                     if (node.nodeType === Node.ELEMENT_NODE) {
                         const tagName = node.tagName.toLowerCase();
-                        if (['script', 'style', 'noscript'].includes(tagName) ||
-                            node.classList.contains('hebrew-bidi-processed')) {
+                        if (['script', 'style', 'noscript'].includes(tagName)) {
                             return NodeFilter.FILTER_REJECT;
                         }
                     }
@@ -135,48 +219,75 @@
 
         // Then process element nodes that weren't already handled
         nodes.forEach(node => {
-            if (node.nodeType === Node.ELEMENT_NODE) {
+            if (node.nodeType === Node.ELEMENT_NODE && !isInputField(node)) {
                 applySmartBiDiFormatting(node);
             }
         });
     }
 
-    // Claude-specific selectors for message content
-    const CLAUDE_MESSAGE_SELECTORS = [
+    // Generic selectors for AI chat platform message content
+    const AI_MESSAGE_SELECTORS = [
+        // Generic message containers
         '[data-testid*="message"]',
-        '.message-content',
-        '.chat-message',
+        '[class*="message"]',
+        '[class*="chat"]',
         'div[role="article"]',
-        'div[data-is-streaming="false"]',
-        'div[data-is-streaming="true"]'
+        '[data-is-streaming]',
+
+        // Claude.ai specific
+        '.message-content',
+
+        // ChatGPT specific
+        '[data-message-author-role]',
+        '.markdown',
+
+        // Common AI platform patterns
+        '[class*="conversation"]',
+        '[class*="response"]',
+        '[class*="assistant"]',
+        '[class*="user"]',
+
+        // Generic content areas
+        'main [class*="content"]',
+        'main p',
+        'main div[class*="text"]'
     ];
 
-    // Function to find Claude message containers
-    function findClaudeMessages() {
+    // Function to find AI chat message containers
+    function findMessageElements() {
         const messages = [];
-        CLAUDE_MESSAGE_SELECTORS.forEach(selector => {
-            const elements = document.querySelectorAll(selector);
-            elements.forEach(el => {
-                if (!el.classList.contains('claude-message-processed')) {
-                    messages.push(el);
-                    el.classList.add('claude-message-processed');
-                }
-            });
+        AI_MESSAGE_SELECTORS.forEach(selector => {
+            try {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(el => {
+                    if (!el.classList.contains('ai-message-processed')) {
+                        messages.push(el);
+                        el.classList.add('ai-message-processed');
+                    }
+                });
+            } catch (e) {
+                // Skip invalid selectors
+                console.debug('Skipping invalid selector:', selector);
+            }
         });
         return messages;
     }
 
-    // Main processing function
-    function processClaudeMessages() {
-        const messages = findClaudeMessages();
+    // Main processing function for AI chat platforms
+    function processAIMessages() {
+        // Process message content
+        const messages = findMessageElements();
         messages.forEach(message => {
             processTextElements(message);
         });
 
-        // Also process any standalone text elements
+        // Set up input field listeners
+        setupInputListeners();
+
+        // Also process any standalone text elements (not input fields)
         const allTextElements = document.querySelectorAll('p, div, span, td, th, li');
         allTextElements.forEach(element => {
-            if (!element.classList.contains('hebrew-bidi-processed')) {
+            if (!element.classList.contains('hebrew-bidi-processed') && !isInputField(element)) {
                 const text = element.textContent;
                 if (containsHebrew(text) && containsEnglish(text)) {
                     applySmartBiDiFormatting(element);
@@ -185,9 +296,28 @@
         });
     }
 
+    // Function to detect current AI platform (for debugging/logging)
+    function detectAIPlatform() {
+        const hostname = window.location.hostname;
+
+        if (hostname.includes('claude.ai')) return 'Claude';
+        if (hostname.includes('openai.com') || hostname.includes('chatgpt.com')) return 'ChatGPT';
+        if (hostname.includes('gemini.google.com') || hostname.includes('bard.google.com')) return 'Gemini';
+        if (hostname.includes('copilot.microsoft.com') || hostname.includes('bing.com')) return 'Copilot';
+        if (hostname.includes('perplexity.ai')) return 'Perplexity';
+        if (hostname.includes('character.ai')) return 'Character.ai';
+        if (hostname.includes('poe.com')) return 'Poe';
+        if (hostname.includes('you.com')) return 'You.com';
+
+        return 'Unknown AI Platform';
+    }
+
     // Initialize and set up observers
     function initialize() {
-        processClaudeMessages();
+        const platform = detectAIPlatform();
+        console.log(`Hebrew BiDi Text Fix extension loaded on: ${platform}`);
+
+        processAIMessages();
 
         // Set up MutationObserver for dynamic content
         const observer = new MutationObserver((mutations) => {
@@ -197,7 +327,7 @@
                     mutation.addedNodes.forEach((node) => {
                         if (node.nodeType === Node.ELEMENT_NODE) {
                             const text = node.textContent || '';
-                            if (containsHebrew(text) || containsEnglish(text)) {
+                            if (containsHebrew(text) || containsEnglish(text) || isInputField(node)) {
                                 shouldProcess = true;
                             }
                         }
@@ -206,7 +336,7 @@
             });
 
             if (shouldProcess) {
-                setTimeout(processClaudeMessages, 100);
+                setTimeout(processAIMessages, 100);
             }
         });
 
@@ -216,8 +346,8 @@
             characterData: true
         });
 
-        // Process periodically for dynamic content
-        setInterval(processClaudeMessages, 2000);
+        // Process periodically for dynamic content and new input fields
+        setInterval(processAIMessages, 3000);
     }
 
     // Wait for DOM to be ready
@@ -230,5 +360,15 @@
     // Also run after a short delay to catch late-loading content
     setTimeout(initialize, 1000);
 
-    console.log('Hebrew BiDi Text Fix extension loaded - Smart Direction Detection');
+    // Additional initialization for SPA (Single Page Applications)
+    // Many AI platforms use client-side routing
+    let currentPath = window.location.pathname;
+    setInterval(() => {
+        if (window.location.pathname !== currentPath) {
+            currentPath = window.location.pathname;
+            console.log('Page navigation detected, reinitializing...');
+            setTimeout(processAIMessages, 500);
+        }
+    }, 1000);
+
 })();
