@@ -1,6 +1,6 @@
 # 🔧 Hebrew Text Direction Fix for AI Chats
 
-**Chrome Extension - Works on 8+ AI Chat Platforms**
+**Chrome Extension - Works on 4+ AI Chat Platforms**
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Coming%20Soon-blue?style=for-the-badge&logo=googlechrome)](https://chrome.google.com/webstore)
 [![GitHub release](https://github.com/DvirKakun/hebrew-text-direction-fix.git?style=for-the-badge)](https://github.com/DvirKakun/hebrew-text-direction-fix.git)
@@ -45,9 +45,6 @@ This extension works automatically on these AI chat platforms:
 - **Google Gemini/Bard** - gemini.google.com, bard.google.com
 - **Microsoft Copilot** - copilot.microsoft.com, Bing Chat
 - **Perplexity.ai** - perplexity.ai
-- **Character.ai** - character.ai
-- **Poe.com** - poe.com
-- **You.com** - you.com
 
 _The extension activates automatically on these sites - no configuration needed!_
 
@@ -56,7 +53,7 @@ _The extension activates automatically on these sites - no configuration needed!
 🎨 **Smart Language Detection** - Automatically detects primary language (Hebrew or English)  
 ⚡ **Real-Time Processing** - Fixes text as you type, instantly  
 🔧 **Zero Configuration** - Install and forget - it just works  
-🌐 **8+ Platforms** - Works on Claude, ChatGPT, Gemini, Copilot, and more  
+🌐 **4+ Platforms** - Works on Claude, ChatGPT, Gemini, Copilot, and more  
 📱 **Lightweight** - Minimal performance impact  
 🛡️ **Privacy-First** - No data collection, works entirely offline  
 🎯 **Smart Targeting** - Only activates on supported AI chat platforms
@@ -183,7 +180,13 @@ hebrew-text-direction-fix/
 ├── manifest.json       # Extension configuration
 ├── content.js         # Main text processing logic
 ├── styles.css        # BiDi CSS rules
-├── icons/           # Extension icons (16px, 48px, 128px)
+├── icon16.png
+├── icon48.png
+├── icon128.png
+├── icon440X280.png
+├── icon1400X560.png
+├── with_extension.png
+├── LICENSE.txt
 └── README.md        # Documentation
 ```
 
@@ -250,7 +253,7 @@ If this extension helped you:
 
 **Made with ❤️ for Hebrew-English bilingual AI chat users**
 
-Works automatically on Claude, ChatGPT, Gemini, Copilot, Perplexity, Character.ai, Poe, and You.com
+Works automatically on Claude, ChatGPT, Gemini, Copilot, and Perplexity.
 
 [⬆ Back to Top](#-hebrew-text-direction-fix-for-ai-chats)
 
