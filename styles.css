@@ -1,0 +1,185 @@
+/* Hebrew BiDi Text Fix Styles - Fixed Input Field Version */
+
+/* Base styles for bidirectionally fixed elements */
+.hebrew-bidi-fixed {
+    unicode-bidi: plaintext !important;
+}
+
+/* RTL-specific styles (Hebrew primary) for regular content */
+.hebrew-bidi-fixed[style*="direction: rtl"]:not(input):not(textarea):not([contenteditable]) {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+/* LTR-specific styles (English primary) for regular content */
+.hebrew-bidi-fixed[style*="direction: ltr"]:not(input):not(textarea):not([contenteditable]) {
+    direction: ltr !important;
+    text-align: left !important;
+}
+
+/* Input field specific styles - use 'start' for proper cursor alignment */
+input.hebrew-bidi-fixed,
+textarea.hebrew-bidi-fixed,
+[contenteditable].hebrew-bidi-fixed,
+[role="textbox"].hebrew-bidi-fixed {
+    unicode-bidi: plaintext !important;
+    text-align: start !important; /* This aligns with the direction automatically */
+}
+
+/* RTL input fields */
+input.hebrew-bidi-fixed[style*="direction: rtl"],
+textarea.hebrew-bidi-fixed[style*="direction: rtl"],
+[contenteditable].hebrew-bidi-fixed[style*="direction: rtl"],
+[role="textbox"].hebrew-bidi-fixed[style*="direction: rtl"] {
+    direction: rtl !important;
+    text-align: start !important; /* Will be right in RTL context */
+}
+
+/* LTR input fields */
+input.hebrew-bidi-fixed[style*="direction: ltr"],
+textarea.hebrew-bidi-fixed[style*="direction: ltr"],
+[contenteditable].hebrew-bidi-fixed[style*="direction: ltr"],
+[role="textbox"].hebrew-bidi-fixed[style*="direction: ltr"] {
+    direction: ltr !important;
+    text-align: start !important; /* Will be left in LTR context */
+}
+
+/* Ensure proper handling of mixed text with plaintext bidi */
+.hebrew-bidi-fixed * {
+    unicode-bidi: plaintext !important;
+}
+
+/* Specific fixes for common AI chat platform input areas */
+
+/* Claude.ai input areas */
+div[contenteditable].hebrew-bidi-fixed,
+div[role="textbox"].hebrew-bidi-fixed {
+    unicode-bidi: plaintext !important;
+    text-align: start !important;
+}
+
+/* ChatGPT input areas */
+textarea.hebrew-bidi-fixed,
+div[contenteditable="true"].hebrew-bidi-fixed {
+    unicode-bidi: plaintext !important;
+    text-align: start !important;
+}
+
+/* Generic contenteditable elements */
+[contenteditable="true"].hebrew-bidi-fixed,
+[contenteditable].hebrew-bidi-fixed {
+    unicode-bidi: plaintext !important;
+    text-align: start !important;
+}
+
+/* Specific fixes for common message display elements */
+[data-testid*="message"] .hebrew-bidi-fixed,
+.message-content .hebrew-bidi-fixed,
+.chat-message .hebrew-bidi-fixed,
+div[role="article"] .hebrew-bidi-fixed {
+    unicode-bidi: plaintext !important;
+}
+
+/* Handle code blocks and pre-formatted text - always LTR */
+.hebrew-bidi-fixed pre,
+.hebrew-bidi-fixed code,
+pre.hebrew-bidi-fixed,
+code.hebrew-bidi-fixed {
+    direction: ltr !important;
+    text-align: left !important;
+    unicode-bidi: normal !important;
+}
+
+/* Handle inline code within mixed text */
+.hebrew-bidi-fixed code {
+    display: inline;
+    direction: ltr !important;
+    unicode-bidi: embed !important;
+}
+
+/* Lists - inherit direction from parent */
+.hebrew-bidi-fixed ul,
+.hebrew-bidi-fixed ol {
+    unicode-bidi: plaintext !important;
+}
+
+.hebrew-bidi-fixed li {
+    unicode-bidi: plaintext !important;
+}
+
+/* Tables - inherit direction from parent */
+.hebrew-bidi-fixed table {
+    unicode-bidi: plaintext !important;
+}
+
+.hebrew-bidi-fixed th,
+.hebrew-bidi-fixed td {
+    unicode-bidi: plaintext !important;
+}
+
+/* Preserve specific language directions when explicitly marked */
+.hebrew-bidi-fixed [lang="he"] {
+    direction: rtl !important;
+    unicode-bidi: embed !important;
+}
+
+.hebrew-bidi-fixed [lang="en"] {
+    direction: ltr !important;
+    unicode-bidi: embed !important;
+}
+
+/* Fix for mathematical expressions and formulas - always LTR */
+.hebrew-bidi-fixed .math,
+.hebrew-bidi-fixed .katex,
+.hebrew-bidi-fixed [class*="math"] {
+    direction: ltr !important;
+    unicode-bidi: normal !important;
+}
+
+/* Ensure URLs and email addresses display correctly */
+.hebrew-bidi-fixed a[href^="http"],
+.hebrew-bidi-fixed a[href^="mailto"] {
+    direction: ltr !important;
+    unicode-bidi: embed !important;
+}
+
+/* Handle quoted text properly */
+.hebrew-bidi-fixed blockquote {
+    unicode-bidi: plaintext !important;
+}
+
+/* Placeholder text alignment for input fields */
+input.hebrew-bidi-fixed::placeholder,
+textarea.hebrew-bidi-fixed::placeholder {
+    text-align: start;
+}
+
+/* Focus state for input fields */
+input.hebrew-bidi-fixed:focus,
+textarea.hebrew-bidi-fixed:focus,
+[contenteditable].hebrew-bidi-fixed:focus {
+    unicode-bidi: plaintext !important;
+}
+
+/* Selection highlighting in bidirectional text */
+.hebrew-bidi-fixed::selection {
+    background-color: rgba(0, 123, 255, 0.3);
+}
+
+/* Caret (cursor) color for better visibility */
+input.hebrew-bidi-fixed,
+textarea.hebrew-bidi-fixed,
+[contenteditable].hebrew-bidi-fixed {
+    caret-color: auto;
+}
+
+/* Ensure proper text flow in streaming content */
+.hebrew-bidi-fixed[data-is-streaming="true"] {
+    unicode-bidi: plaintext !important;
+}
+
+/* Fix for nested elements in chat messages */
+.hebrew-bidi-fixed p,
+.hebrew-bidi-fixed div {
+    unicode-bidi: plaintext !important;
+}
